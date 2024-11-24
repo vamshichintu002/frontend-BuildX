@@ -10,14 +10,22 @@ export const useSupabaseSync = () => {
       if (!isLoaded || !isSignedIn || !user) return;
 
       try {
+        console.log('Syncing user with Supabase:', {
+          clerkId: user.id,
+          email: user.primaryEmailAddress?.emailAddress
+        });
+
         // Check if user already exists
-        const { data: existingUser } = await supabase
+        const { data: existingUser, error: checkError } = await supabase
           .from('users')
           .select('id')
           .eq('clerk_id', user.id)
           .single();
 
+        console.log('Check existing user result:', { existingUser, checkError });
+
         if (!existingUser) {
+          console.log('Creating new user in Supabase');
           // Insert new user
           const { error } = await supabase.from('users').insert({
             clerk_id: user.id,
@@ -29,8 +37,13 @@ export const useSupabaseSync = () => {
             updated_at: new Date().toISOString(),
           });
 
-          if (error) throw error;
+          if (error) {
+            console.error('Error creating user:', error);
+            throw error;
+          }
+          console.log('Successfully created user in Supabase');
         } else {
+          console.log('Updating existing user in Supabase');
           // Update existing user
           const { error } = await supabase
             .from('users')
@@ -43,7 +56,11 @@ export const useSupabaseSync = () => {
             })
             .eq('clerk_id', user.id);
 
-          if (error) throw error;
+          if (error) {
+            console.error('Error updating user:', error);
+            throw error;
+          }
+          console.log('Successfully updated user in Supabase');
         }
       } catch (error) {
         console.error('Error syncing user with Supabase:', error);

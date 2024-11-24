@@ -5,6 +5,7 @@ import Dashboard from './pages/Dashboard';
 import NewClient from './pages/NewClient';
 import Auth from './pages/Auth';
 import { Toaster } from 'react-hot-toast';
+import { useSupabaseSync } from './hooks/useSupabaseSync';
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const { isSignedIn, isLoaded } = useAuth();
@@ -26,6 +27,7 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
 
 const App = () => {
   const { isSignedIn } = useAuth();
+  useSupabaseSync();
 
   return (
     <>

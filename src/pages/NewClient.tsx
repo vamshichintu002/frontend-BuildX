@@ -11,16 +11,16 @@ import { RadioGroup } from '../components/RadioGroup';
 import { STEP_TITLES, RISK_TOLERANCE_OPTIONS } from '../constants';
 import { FormData } from '../types/form';
 import { initialFormData } from '../utils/initialState';
-import { useSupabaseSync } from '../hooks/useSupabaseSync';
+import { useFormSubmission } from '../hooks/useFormSubmission';
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-hot-toast';
 
 export const NewClient = () => {
   const [step, setStep] = useState(1);
   const [formData, setFormData] = useState<FormData>(initialFormData);
   const navigate = useNavigate();
+  const { submitForm } = useFormSubmission();
   
-  useSupabaseSync();
-
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
@@ -123,9 +123,16 @@ export const NewClient = () => {
   const prevStep = () => setStep(prev => Math.max(prev - 1, 1));
   
   const handleSubmit = async () => {
-    console.log('Form submitted:', formData);
-    // Add submission logic here
-    navigate('/dashboard');
+    if (!validateStep(5)) {
+      toast.error('Please fill in all required fields before submitting.');
+      return;
+    }
+
+    const result = await submitForm(formData);
+    
+    if (result) {
+      navigate('/dashboard');
+    }
   };
 
   return (
