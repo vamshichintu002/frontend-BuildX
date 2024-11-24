@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
 import { Plus, LogOut, Users, FileText, Settings, ChevronRight, X, Copy, Check } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useClerk, useUser } from '@clerk/clerk-react';
 import { createClient } from '@supabase/supabase-js';
 import { toast } from 'react-hot-toast';
+import { Analytics } from '../components/Analytics';
+import { Dialog, DialogContent } from '@mui/material';
 
 // Initialize Supabase client
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
@@ -107,16 +108,10 @@ const NewClientModal: React.FC<NewClientModalProps> = ({ isOpen, onClose, onSubm
   if (!isOpen) return null;
 
   return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
+    <div
       className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
     >
-      <motion.div
-        initial={{ scale: 0.95, opacity: 0 }}
-        animate={{ scale: 1, opacity: 1 }}
-        exit={{ scale: 0.95, opacity: 0 }}
+      <div
         className="bg-white rounded-lg p-6 w-full max-w-md"
       >
         <div className="flex justify-between items-center mb-4">
@@ -200,8 +195,8 @@ const NewClientModal: React.FC<NewClientModalProps> = ({ isOpen, onClose, onSubm
             </button>
           </div>
         </form>
-      </motion.div>
-    </motion.div>
+      </div>
+    </div>
   );
 };
 
@@ -212,6 +207,8 @@ export const Dashboard = () => {
   const [clients, setClients] = useState<Client[]>([]);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedClientId, setSelectedClientId] = useState<string | null>(null);
+  const [isAnalyticsOpen, setIsAnalyticsOpen] = useState(false);
 
   useEffect(() => {
     if (user?.id) {
@@ -305,6 +302,16 @@ export const Dashboard = () => {
     }
   };
 
+  const handleViewPortfolio = (clientId: string) => {
+    setSelectedClientId(clientId);
+    setIsAnalyticsOpen(true);
+  };
+
+  const handleCloseAnalytics = () => {
+    setIsAnalyticsOpen(false);
+    setSelectedClientId(null);
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Navigation Bar */}
@@ -338,9 +345,7 @@ export const Dashboard = () => {
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Stats Overview */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
+          <div
             className="bg-white rounded-lg shadow-sm p-6"
           >
             <div className="flex items-center">
@@ -350,12 +355,9 @@ export const Dashboard = () => {
                 <p className="text-2xl font-semibold text-gray-900">{clients.length}</p>
               </div>
             </div>
-          </motion.div>
+          </div>
 
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}
+          <div
             className="bg-white rounded-lg shadow-sm p-6"
           >
             <div className="flex items-center">
@@ -365,12 +367,9 @@ export const Dashboard = () => {
                 <p className="text-2xl font-semibold text-gray-900">{clients.length}</p>
               </div>
             </div>
-          </motion.div>
+          </div>
 
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
+          <div
             className="bg-white rounded-lg shadow-sm p-6"
           >
             <div className="flex items-center">
@@ -382,7 +381,7 @@ export const Dashboard = () => {
                 </button>
               </div>
             </div>
-          </motion.div>
+          </div>
         </div>
 
         {/* Client List */}
@@ -416,35 +415,61 @@ export const Dashboard = () => {
           ) : (
             <div className="divide-y divide-gray-200">
               {clients.map((client) => (
-                <motion.div
+                <div
                   key={client.id}
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  className="p-6 hover:bg-gray-50 cursor-pointer flex justify-between items-center"
-                  onClick={() => navigate(`/client/${client.id}`)}
+                  className="bg-white rounded-lg shadow-sm p-4 mb-4 hover:bg-gray-50 transition-colors duration-200"
                 >
-                  <div>
-                    <h3 className="text-sm font-medium text-gray-900">{client.name}</h3>
-                    <p className="text-sm text-gray-500">{client.email}</p>
-                    <p className="text-sm text-gray-500">{client.phone}</p>
+                  <div className="flex justify-between items-center">
+                    <div>
+                      <h3 className="text-lg font-semibold">{client.name}</h3>
+                      <p className="text-gray-600">{client.email}</p>
+                    </div>
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => handleViewPortfolio(client.id)}
+                        className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+                      >
+                        View Portfolio
+                      </button>
+                      <button
+                        onClick={() => navigate(`/client/${client.id}`)}
+                        className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                      >
+                        <ChevronRight className="h-5 w-5 text-gray-400" />
+                      </button>
+                    </div>
                   </div>
-                  <ChevronRight className="h-5 w-5 text-gray-400" />
-                </motion.div>
+                </div>
               ))}
             </div>
           )}
         </div>
       </main>
 
-      <AnimatePresence>
-        {isModalOpen && (
-          <NewClientModal
-            isOpen={isModalOpen}
-            onClose={() => setIsModalOpen(false)}
-            onSubmit={handleAddClient}
-          />
-        )}
-      </AnimatePresence>
+      {isModalOpen && (
+        <NewClientModal
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+          onSubmit={handleAddClient}
+        />
+      )}
+
+      {/* Add Analytics Dialog */}
+      <Dialog
+        open={isAnalyticsOpen}
+        onClose={handleCloseAnalytics}
+        maxWidth="lg"
+        fullWidth
+      >
+        <DialogContent className="p-0">
+          {selectedClientId && (
+            <Analytics 
+              clientId={selectedClientId} 
+              onClose={handleCloseAnalytics}
+            />
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
