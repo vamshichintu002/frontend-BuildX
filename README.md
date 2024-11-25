@@ -43,7 +43,7 @@ VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
 ## Installation
 1. Clone the repository:
 ```bash
-git clone <repository-url>
+git clone https://github.com/vamshichintu002/frontend-BuildX
 cd project
 ```
 
