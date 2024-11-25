@@ -76,7 +76,7 @@ const NewClientModal: React.FC<NewClientModalProps> = ({ isOpen, onClose, onSubm
   const [email, setEmail] = useState('');
   const [copied, setCopied] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const formLink = `${window.location.origin}/new-client`; // Your form link
+  const formLink = `${window.location.origin}/new_client`; // Your form link
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

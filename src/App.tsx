@@ -52,7 +52,7 @@ const App = () => {
         />
         
         <Route 
-          path="/new-client" 
+          path="/new_client" 
           element={
             <ProtectedRoute>
               <NewClient />
