@@ -4,7 +4,6 @@ import { useNavigate } from 'react-router-dom';
 import { useClerk, useUser } from '@clerk/clerk-react';
 import { toast } from 'react-hot-toast';
 import { Analytics } from '../components/Analytics';
-import { Dialog, DialogContent } from '@mui/material';
 import { supabase } from '../utils/supabase';
 
 // Initialize Supabase client
@@ -195,6 +194,29 @@ const NewClientModal: React.FC<NewClientModalProps> = ({ isOpen, onClose, onSubm
             </button>
           </div>
         </form>
+      </div>
+    </div>
+  );
+};
+
+const AnalyticsModal: React.FC<{ isOpen: boolean; onClose: () => void; clientId: string | null }> = ({ isOpen, onClose, clientId }) => {
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
+      <div className="bg-white rounded-lg p-6 max-w-md w-full">
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="text-xl font-semibold">Analytics</h2>
+          <button
+            onClick={onClose}
+            className="text-gray-500 hover:text-gray-700"
+          >
+            <X size={20} />
+          </button>
+        </div>
+        {clientId && (
+          <Analytics clientId={clientId} onClose={onClose} />
+        )}
       </div>
     </div>
   );
@@ -455,22 +477,13 @@ export const Dashboard = () => {
         />
       )}
 
-      {/* Add Analytics Dialog */}
-      <Dialog
-        open={isAnalyticsOpen}
-        onClose={handleCloseAnalytics}
-        maxWidth="lg"
-        fullWidth
-      >
-        <DialogContent className="p-0">
-          {selectedClientId && (
-            <Analytics 
-              clientId={selectedClientId} 
-              onClose={handleCloseAnalytics}
-            />
-          )}
-        </DialogContent>
-      </Dialog>
+      {isAnalyticsOpen && (
+        <AnalyticsModal
+          isOpen={isAnalyticsOpen}
+          onClose={handleCloseAnalytics}
+          clientId={selectedClientId}
+        />
+      )}
     </div>
   );
 };
