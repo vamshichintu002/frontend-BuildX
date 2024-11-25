@@ -35,10 +35,13 @@ export const useFormSubmission = () => {
         console.log('Found existing client:', clientId);
       } else {
         console.log('Creating new client for user:', user.id);
-        // 2. Create new client
+        // Generate a unique client ID
+        const newClientId = `client_${user.id}_${Date.now()}`;
+        
         const { data: newClient, error: clientError } = await supabase
           .from('clients')
           .insert({
+            id: newClientId,
             user_id: user.id,
             name: formData.name || user.fullName || '',
             email: user.primaryEmailAddress?.emailAddress || '',
@@ -60,11 +63,14 @@ export const useFormSubmission = () => {
         console.log('Created new client with ID:', clientId);
       }
 
-      // 3. Create form submission
+      // Generate a unique form ID
+      const formId = `form_${user.id}_${Date.now()}`;
+      
       console.log('Creating form submission for client:', clientId);
       const { data: submission, error: formError } = await supabase
         .from('client_forms')
         .insert({
+          id: formId,
           client_id: clientId,
           user_id: user.id,
           name: formData.name || user.fullName || '',
@@ -97,9 +103,10 @@ export const useFormSubmission = () => {
       console.log('Form submitted successfully:', submission);
       toast.success('Form submitted successfully!');
       return submission;
+
     } catch (error: any) {
       console.error('Error in form submission:', error);
-      toast.error(error.message || 'Failed to submit form');
+      toast.error(`Failed to submit form: ${error.message}`);
       return null;
     }
   };

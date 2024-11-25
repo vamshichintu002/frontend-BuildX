@@ -2,10 +2,10 @@ import React, { useEffect, useState } from 'react';
 import { Plus, LogOut, Users, FileText, Settings, ChevronRight, X, Copy, Check } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useClerk, useUser } from '@clerk/clerk-react';
-import { createClient } from '@supabase/supabase-js';
 import { toast } from 'react-hot-toast';
 import { Analytics } from '../components/Analytics';
 import { Dialog, DialogContent } from '@mui/material';
+import { supabase } from '../utils/supabase';
 
 // Initialize Supabase client
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
@@ -15,7 +15,7 @@ if (!supabaseUrl || !supabaseAnonKey) {
   throw new Error('Missing Supabase environment variables');
 }
 
-const supabase = createClient(supabaseUrl, supabaseAnonKey);
+// Removed the anonymous Supabase client initialization
 
 console.log('Initializing Supabase with:', {
   url: supabaseUrl,
@@ -255,8 +255,9 @@ export const Dashboard = () => {
     }
 
     try {
-      // Create the client object
+      // Create the client object with explicit ID
       const newClient = {
+        id: `client_${user.id}_${Date.now()}`, // Generate a unique ID
         name: clientData.name,
         phone: clientData.phone,
         email: clientData.email,
